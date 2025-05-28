@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,6 +35,35 @@ class AuthController extends Controller
                 "message" => "Usuário criado com sucesso"
             ], 201);
         }
+
+        return response()->json(["status" => "error", "message" => "Erro desconhecido"], 200);
+    }
+
+    public function login(Request $request)
+    {
+        $validate = Validator::make($request->all(), [
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json(["status" => "error", "message" => $validate->errors()->getMessages()], 200);
+        }
+
+        $validated = $validate->validated();
+
+        if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+            $user = Auth::user();
+            $token = $user->createToken('mobile_token')->plainTextToken;
+            return response()->json(
+                [
+                    "status" => "success",
+                    "data" => ['user' => $user, 'token' => $token],
+                    "message" => "Logado com sucesso"
+                ], 200
+            );
+        }
+
         return response()->json(["status" => "error", "message" => "Erro desconhecido"], 200);
     }
 }
