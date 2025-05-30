@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function Cadastro() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleCadastro = async () => {
     if (!name || !email || !password) {
@@ -79,6 +81,7 @@ export default function Cadastro() {
       />
 
       <Button title="Cadastrar" onPress={handleCadastro} />
+      <Button title="Logar" onPress={() => router.push('/login')} />
     </View>
   );
 }

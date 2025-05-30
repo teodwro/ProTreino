@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
-
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -42,7 +39,7 @@ export default function Login() {
   };
 
 
-  const navigation = useNavigation();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -68,7 +65,7 @@ export default function Login() {
       />
 
       <Button title="Entrar" onPress={handleLogin} />
-      <Button title="Criar" onPress={() => navigation.navigate('cadastro')} />
+      <Button title="Criar" onPress={() => router.push('/cadastro')} />
     </View>
   );
 }
