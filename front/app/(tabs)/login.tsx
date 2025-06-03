@@ -8,37 +8,54 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
+      console.log('Preencha tudo')
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
-
+  
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://127.0.0.1:8000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        body: JSON.stringify({ email, password }),
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        Alert.alert('Sucesso', data.mensagem || 'Login realizado com sucesso!');
+  
+      const text = await response.text();
+      console.log('Status:', response.status);
+      console.log('Texto da resposta:', text);
+  
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('Erro ao interpretar JSON:', e);
+        Alert.alert('Erro', 'Resposta inválida do servidor');
+        return;
+      }
+  
+      if (response.ok && data.status === 'success') {
+        console.log('Usuário:', data.data.user);
+        console.log('Token:', data.data.token);
+  
+        Alert.alert('Sucesso', data.message || 'Login realizado com sucesso!');
+  
+        // Salvar token no storage, se desejar:
+        // await AsyncStorage.setItem('token', data.data.token);
+  
+        // Limpa campos
         setEmail('');
         setPassword('');
       } else {
         Alert.alert('Erro', data.message || 'Credenciais inválidas');
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', 'Erro de conexão com o servidor');
+      console.error('Erro de rede:', error);
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor');
     }
   };
-
-
+  
   const router = useRouter();
 
   return (

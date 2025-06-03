@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Log;
 
 class AuthController extends Controller
 {
@@ -41,29 +42,41 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        Log::info('Login recebido:', $request->all());
+    
         $validate = Validator::make($request->all(), [
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
-
+    
         if ($validate->fails()) {
-            return response()->json(["status" => "error", "message" => $validate->errors()->getMessages()], 200);
+            Log::warning('Validação falhou', $validate->errors()->toArray());
+            return response()->json([
+                "status" => "error",
+                "message" => $validate->errors()->getMessages()
+            ], 422); // 422 Unprocessable Entity
         }
-
+    
         $validated = $validate->validated();
-
+    
         if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
             $user = Auth::user();
             $token = $user->createToken('mobile_token')->plainTextToken;
-            return response()->json(
-                [
-                    "status" => "success",
-                    "data" => ['user' => $user, 'token' => $token],
-                    "message" => "Logado com sucesso"
-                ], 200
-            );
+    
+            Log::info('Login bem-sucedido para:', ['email' => $user->email]);
+    
+            return response()->json([
+                "status" => "success",
+                "data" => ['user' => $user, 'token' => $token],
+                "message" => "Logado com sucesso"
+            ], 200);
         }
-
-        return response()->json(["status" => "error", "message" => "Erro desconhecido"], 200);
+    
+        Log::warning('Credenciais inválidas para:', ['email' => $validated['email']]);
+    
+        return response()->json([
+            "status" => "error",
+            "message" => "Credenciais inválidas"
+        ], 401); // 401 Unauthorized
     }
 }
