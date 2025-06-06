@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Stack } from 'expo-router';
 
 export default function Cadastro() {
   const [name, setName] = useState('');
@@ -49,62 +51,95 @@ export default function Cadastro() {
   };
 
   return (
-    <View style={styles.container}>
-        
-      <Text style={styles.title}>Cadastro</Text>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
+        <StatusBar barStyle="light-content" />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        placeholderTextColor="black"
-        value={name}
-        onChangeText={setName}
-      />
+        <Text style={styles.title}>Criar Conta</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        placeholderTextColor="black"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Nome"
+          placeholderTextColor="#94a3b8"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor="black"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          placeholderTextColor="#94a3b8"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <Button title="Cadastrar" onPress={handleCadastro} />
-      <Button title="Logar" onPress={() => router.push('/login')} />
-    </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#94a3b8"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push('/login')}>
+          <Text style={styles.linkText}>Já tem uma conta? Faça login</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
     justifyContent: 'center',
-    backgroundColor: '#f9f9f9',
+    padding: 24,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
-    marginBottom: 24,
-    textAlign: 'center',
     fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 32,
+    textAlign: 'center',
   },
   input: {
-    backgroundColor: '#fff',
-    padding: 12,
+    width: '100%',
+    backgroundColor: '#1e293b',
+    color: '#fff',
+    padding: 14,
     marginBottom: 16,
     borderRadius: 8,
-    borderColor: 'black',
+    borderColor: '#334155',
     borderWidth: 1,
+  },
+  button: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 14,
+    paddingHorizontal: 64,
+    borderRadius: 999,
+    marginBottom: 16,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  linkText: {
+    color: '#3b82f6',
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: 'center',
   },
 });
