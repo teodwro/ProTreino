@@ -43,8 +43,6 @@ export default function Cadastro() {
         Alert.alert('Erro', 'Erro de conexão com o servidor');
     }
 
-    
-    // Limpa os campos
     setName('');
     setEmail('');
     setPassword('');
@@ -111,7 +109,7 @@ const styles = StyleSheet.create({
     height: 220,
     resizeMode: 'contain',
     marginBottom: 20,
-    alignSelf: 'center', // <- Centraliza a logo
+    alignSelf: 'center',
   },
   title: {
     fontSize: 28,
