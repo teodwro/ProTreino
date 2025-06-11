@@ -54,6 +54,8 @@ export default function Login() {
         // Limpa campos
         setEmail('');
         setPassword('');
+        router.push('/');
+
       } else {
         Alert.alert('Erro', data.message || 'Credenciais inválidas');
       }
