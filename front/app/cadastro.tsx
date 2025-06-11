@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, StatusBar, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
@@ -55,6 +55,7 @@ export default function Cadastro() {
       <Stack.Screen options={{ headerShown: false }} />
       <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
         <StatusBar barStyle="light-content" />
+        <Image source={require('../assets/images/logo.png')} style={styles.logo} />
 
         <Text style={styles.title}>Criar Conta</Text>
 
@@ -104,6 +105,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
     alignItems: 'center',
+  },
+  logo: {
+    width: 220,
+    height: 220,
+    resizeMode: 'contain',
+    marginBottom: 20,
+    alignSelf: 'center', // <- Centraliza a logo
   },
   title: {
     fontSize: 28,

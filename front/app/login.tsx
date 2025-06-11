@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TextInput, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
+import { Text, TextInput, StyleSheet, TouchableOpacity, StatusBar, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
@@ -7,6 +7,7 @@ import { Stack } from 'expo-router';
 export const unstable_settings = {
   headerShown: false, // para esconder a header na tela
 };
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -71,6 +72,11 @@ export default function Login() {
         <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
           <StatusBar barStyle="light-content" />
 
+          <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+
+        
+
+
           <Text style={styles.title}>Login</Text>
 
           <TextInput
@@ -111,6 +117,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
     alignItems: 'center',
+  },
+  logo: {
+    width: 220,
+    height: 220,
+    resizeMode: 'contain',
+    marginBottom: 20,
+    alignSelf: 'center', // <- Centraliza a logo
   },
   title: {
     fontSize: 28,
