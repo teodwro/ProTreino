@@ -31,8 +31,8 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
-          marginTop: -4,  // Ajuste fino para alinhar melhor
-          marginBottom: 4, // Espaço extra na base
+          marginTop: -4,
+          marginBottom: 4
         },
       }}>
       <Tabs.Screen
@@ -98,11 +98,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
     padding: 8,
     borderRadius: 16,
-    marginTop: 4,  // Ajuste adicional para ícones
+    marginTop: 4, 
   },
   iconInactive: {
     padding: 8,
     borderRadius: 16,
-    marginTop: 4,  // Ajuste adicional para ícones
+    marginTop: 4, 
   },
 });

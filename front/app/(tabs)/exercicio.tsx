@@ -11,12 +11,14 @@ export default function Exercicios() {
   const [pchFilter, setPchFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/pch')
-      .then(response => response.json())
-      .then(json => setPchList(json.data || []))
-      .catch(() => setPchList([]));
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetch('http://127.0.0.1:8000/api/pch')
+        .then(response => response.json())
+        .then(json => setPchList(json.data || []))
+        .catch(() => setPchList([]));
+    }, [])
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -32,6 +34,13 @@ export default function Exercicios() {
   const exerciciosFiltrados = pchFilter
     ? exercicios.filter(e => String(e.pch?.id) === String(pchFilter))
     : exercicios;
+
+  const handleExercisePress = (exerciseId) => {
+    router.push({
+      pathname: '/showexercicio',
+      params: { id: exerciseId }
+    });
+  };
 
   return (
     <>
@@ -64,10 +73,13 @@ export default function Exercicios() {
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={styles.listContainer}
             renderItem={({ item }) => (
-              <View style={styles.card}>
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() => router.push(`/exercicios/${item.id}`)} // caminho relativo à aba
+              >
                 <Text style={styles.cardTitle}>{item.nome}</Text>
                 <Text style={styles.cardSubtitle}>{item.pch?.nome}</Text>
-              </View>
+              </TouchableOpacity>
             )}
           />
         )}

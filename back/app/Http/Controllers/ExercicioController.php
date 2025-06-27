@@ -47,44 +47,53 @@ class ExercicioController extends Controller
         }
     }
 
-    public function show(Exercicio $exercicio)
-    {
-        try {
+    public function show($id)
+{
+    try {
+        $exercicio = Exercicio::with('pch')->find($id);
+
+        if (!$exercicio) {
             return response()->json([
-                'message' => 'Exercício encontrado com sucesso.',
-                'data' => $exercicio
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erro ao buscar o exercício.',
-                'details' => $e->getMessage()
-            ], 500);
+                'error' => 'Exercício não encontrado.'
+            ], 404);
         }
+
+        return response()->json([
+            'message' => 'Exercício encontrado com sucesso.',
+            'data' => $exercicio
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Erro ao buscar o exercício.',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
 
-    public function update(Request $request, Exercicio $exercicio)
-    {
-        try {
-            $request->validate([
-                'exercicio' => 'sometimes|required|string',
-                'series' => 'sometimes|required|integer',
-                'repeticoes' => 'sometimes|required|string',
-                'carga' => 'nullable|numeric',
-            ]);
 
-            $exercicio->update($request->all());
 
-            return response()->json([
-                'message' => 'Exercício atualizado com sucesso.',
-                'data' => $exercicio
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erro ao atualizar o exercício.',
-                'details' => $e->getMessage()
-            ], 500);
-        }
+public function update(Request $request, Exercicio $exercicio)
+{
+    try {
+        $request->validate([
+            'nome' => 'sometimes|required|string',
+            //fazer bgl do grupo
+        ]);
+
+        $exercicio->update($request->only('nome'));
+
+        return response()->json([
+            'message' => 'Exercício atualizado com sucesso.',
+            'data' => $exercicio
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Erro ao atualizar o exercício.',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     public function destroy(Exercicio $exercicio)
     {
