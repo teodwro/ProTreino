@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exercicios', function (Blueprint $table) {
+        Schema::create('pch', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
-            $table->unsignedBigInteger('pch_id');
+            $table->string('nome')->unique();
             $table->timestamps();
         });
     }
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('exercicios');
+        Schema::dropIfExists('pch');
     }
 };

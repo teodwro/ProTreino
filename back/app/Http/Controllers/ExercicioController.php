@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exercicio;
+use App\Models\Pch;
 use Illuminate\Http\Request;
 
 class ExercicioController extends Controller
@@ -10,7 +11,7 @@ class ExercicioController extends Controller
     public function index()
     {
         try {
-            $exercicios = Exercicio::all();
+            $exercicios = Exercicio::with('pch')->orderBy('created_at', 'desc')->get();
             return response()->json([
                 'message' => 'Lista de exercícios carregada com sucesso.',
                 'data' => $exercicios
@@ -28,7 +29,7 @@ class ExercicioController extends Controller
         try {
             $request->validate([
                 'nome' => 'required|string',
-                'pch' => 'required|string',
+                'pch_id' => 'required|integer|exists:pch,id',
             ]);
 
             $exercicio = Exercicio::create($request->all());
@@ -38,7 +39,6 @@ class ExercicioController extends Controller
                 'message' => 'Exercício salvo com sucesso.',
                 'data' => $exercicio
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Erro ao salvar o treino.',

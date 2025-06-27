@@ -5,17 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Exercicio extends Model
+class Pch extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'nome',
-        'pch_id',
-    ];
+    protected $table = 'pch';
 
-    public function pch()
-    {
-        return $this->belongsTo(Pch::class, 'pch_id');
-    }
+    protected $fillable = [
+        'nome'
+    ];
 }

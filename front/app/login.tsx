@@ -54,7 +54,7 @@ export default function Login() {
         // Limpa campos
         setEmail('');
         setPassword('');
-        router.push('/');
+        router.push('/exercicio'); // Redireciona para a tela de exercícios
 
       } else {
         Alert.alert('Erro', data.message || 'Credenciais inválidas');

@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         // User::factory(10)->create();
@@ -39,5 +36,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'devilla@gmail.com',
             'password' => Hash::make('123123')
         ]);
+
+        $this->call(PchSeeder::class);
+        $this->call(ExercicioSeeder::class);
     }
 }

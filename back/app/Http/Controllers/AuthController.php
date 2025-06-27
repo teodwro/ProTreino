@@ -33,7 +33,7 @@ class AuthController extends Controller
         if ($user->save()) {
             return response()->json([
                 "status" => "success",
-                "message" => "Usuário criado com sucesso"
+                "message" => "Usuário criado com sucesso!"
             ], 201);
         }
 
@@ -42,15 +42,13 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        Log::info('Login recebido:', $request->all());
-    
+
         $validate = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
     
         if ($validate->fails()) {
-            Log::warning('Validação falhou', $validate->errors()->toArray());
             return response()->json([
                 "status" => "error",
                 "message" => $validate->errors()->getMessages()
@@ -61,22 +59,18 @@ class AuthController extends Controller
     
         if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
             $user = Auth::user();
-            $token = $user->createToken('mobile_token')->plainTextToken;
-    
-            Log::info('Login bem-sucedido para:', ['email' => $user->email]);
+            $token = $user->createToken('mobile_token')->plainTextToken;   
     
             return response()->json([
                 "status" => "success",
                 "data" => ['user' => $user, 'token' => $token],
-                "message" => "Logado com sucesso"
+                "message" => "Logado com sucesso!"
             ], 200);
         }
     
-        Log::warning('Credenciais inválidas para:', ['email' => $validated['email']]);
-    
         return response()->json([
             "status" => "error",
-            "message" => "Credenciais inválidas"
+            "message" => "Credenciais inválidas!"
         ], 401); // 401 Unauthorized
     }
 }
