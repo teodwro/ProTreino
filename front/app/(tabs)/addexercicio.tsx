@@ -49,6 +49,7 @@ export default function AdicionarExercicio() {
       try {
         data = JSON.parse(text);
       } catch (error) {
+        console.error("Erro ao interpretar JSON:", error);
         Alert.alert("Erro", "Resposta inválida do servidor");
         return;
       }
@@ -65,6 +66,7 @@ export default function AdicionarExercicio() {
         Alert.alert("Erro", data.message || "Erro ao cadastrar exercício");
       }
     } catch (error) {
+      console.error("Erro ao adicionar exercício:", error);
       Alert.alert("Erro", "Não foi possível conectar ao servidor");
     }
   };

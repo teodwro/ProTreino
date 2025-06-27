@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TextInput, StyleSheet, TouchableOpacity, StatusBar, Alert, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter , Stack} from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
 
 export const unstable_settings = {
   headerShown: false, // para esconder a header na tela

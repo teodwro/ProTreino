@@ -30,6 +30,7 @@ export default function AddPch() {
         Alert.alert("Erro", data.message || data.error || "Erro ao cadastrar grupo muscular");
       }
     } catch (error) {
+      console.error("Erro ao adicionar grupo muscular:", error);
       Alert.alert("Erro", "Não foi possível conectar ao servidor");
     }
   };
