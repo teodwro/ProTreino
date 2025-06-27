@@ -29,7 +29,6 @@ export default function Exercicios() {
     }, [])
   );
 
-  // Filtra os exercícios conforme o filtro selecionado
   const exerciciosFiltrados = pchFilter
     ? exercicios.filter(e => String(e.pch?.id) === String(pchFilter))
     : exercicios;
