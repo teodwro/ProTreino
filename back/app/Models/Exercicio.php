@@ -10,9 +10,7 @@ class Exercicio extends Model
     use HasFactory;
 
     protected $fillable = [
-        'exercicio',
-        'series',
-        'repeticoes',
-        'carga',
+        'nome',
+        'pch',
     ];
 }

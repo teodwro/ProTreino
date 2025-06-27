@@ -27,16 +27,15 @@ class ExercicioController extends Controller
     {
         try {
             $request->validate([
-                'exercicio' => 'required|string',
-                'series' => 'required|integer',
-                'repeticoes' => 'required|string',
-                'carga' => 'nullable|numeric',
+                'nome' => 'required|string',
+                'pch' => 'required|string',
             ]);
 
             $exercicio = Exercicio::create($request->all());
 
             return response()->json([
-                'message' => 'Treino salvo com sucesso.',
+                'status' => 'success',
+                'message' => 'Exercício salvo com sucesso.',
                 'data' => $exercicio
             ], 201);
 
