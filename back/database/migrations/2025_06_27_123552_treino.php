@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('treino', function (Blueprint $table) {
             $table->id();
-            $table->enum('dia_semana', ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo']);
+            $table->string('dia_semana');
             $table->timestamps();
         });
     }
