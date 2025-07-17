@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Picker } from '@react-native-picker/picker';
+
 
 
 type Exercicio = {
@@ -29,6 +31,9 @@ export default function ExercicioShow() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const [pchId, setPchId] = useState<number | null>(null);
+  const [grupos, setGrupos] = useState<{ id: number; nome: string }[]>([]);
+
   // Estados para os campos editáveis
   const [nome, setNome] = useState('');
 
@@ -40,12 +45,18 @@ export default function ExercicioShow() {
         if (json.data) {
           setExercicio(json.data);
           setNome(json.data.nome || '');
+          setPchId(json.data.pch?.id || null);
         } else {
           setExercicio(null);
         }
       })
       .catch(() => setExercicio(null))
       .finally(() => setLoading(false));
+
+      fetch('http://127.0.0.1:8000/api/pch') // ajuste o endpoint conforme seu backend
+      .then((res) => res.json())
+      .then((json) => setGrupos(json.data || []))
+      .catch((err) => console.log('Erro ao carregar grupos:', err));
   }, [id]);
 
   async function handleSave() {
@@ -63,6 +74,7 @@ export default function ExercicioShow() {
         },
         body: JSON.stringify({
           nome,
+          pch_id: pchId,
         }),
       });
 
@@ -125,8 +137,21 @@ export default function ExercicioShow() {
               editable={!saving && !deleting}
             />
 
-            <Text style={styles.label}>Grupo:</Text>
-            <Text style={styles.subtitle}>{exercicio.pch?.nome || 'Sem grupo'}</Text>
+            <Text style={styles.label}>Grupo Muscular:</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={pchId}
+                onValueChange={(itemValue) => setPchId(itemValue)}
+                enabled={!saving && !deleting}
+                dropdownIconColor="#fff"
+                style={styles.picker}
+              >
+                <Picker.Item label="Selecione um grupo" value={null} />
+                {grupos.map((grupo) => (
+                  <Picker.Item key={grupo.id} label={grupo.nome} value={grupo.id} />
+                ))}
+              </Picker>
+            </View>
 
             <TouchableOpacity
               style={[styles.button, styles.saveButton]}
@@ -214,4 +239,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 60,
   },
+
+  pickerWrapper: {
+  backgroundColor: '#1e293b',
+  borderRadius: 8,
+  marginBottom: 24,
+},
+picker: {
+  color: '#fff',
+  height: 50,
+  paddingHorizontal: 14,
+},
 });

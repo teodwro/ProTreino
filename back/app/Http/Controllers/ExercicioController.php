@@ -77,10 +77,10 @@ public function update(Request $request, Exercicio $exercicio)
     try {
         $request->validate([
             'nome' => 'sometimes|required|string',
-            //fazer bgl do grupo
+            'pch_id' => 'sometimes|required|exists:pch,id'
         ]);
 
-        $exercicio->update($request->only('nome'));
+        $exercicio->update($request->only(['nome', 'pch_id']));
 
         return response()->json([
             'message' => 'Exercício atualizado com sucesso.',
