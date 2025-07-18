@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('treino', function (Blueprint $table) {
+        Schema::create('treinos', function (Blueprint $table) {
             $table->id();
-            $table->string('dia_semana');
+            $table->unsignedTinyInteger('dia_semana'); // 1 a 7
+            $table->foreignId('pch_id')->constrained('pch');
             $table->timestamps();
         });
     }

@@ -18,4 +18,11 @@ class Exercicio extends Model
     {
         return $this->belongsTo(Pch::class, 'pch_id');
     }
+
+    public function treinos()
+{
+    return $this->belongsToMany(Treino::class, 'exercicio_treino')
+        ->withPivot('series', 'repeticoes', 'carga')
+        ->withTimestamps();
+}
 }
