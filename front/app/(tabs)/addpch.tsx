@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, StatusBar } from "react-native";
 import { useRouter, Stack } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function AddPch() {
   const [nome, setNome] = useState("");
   const router = useRouter();
+  const { token } = useAuth();
 
   const handleAdicionar = async () => {
     if (!nome) {
@@ -16,7 +18,10 @@ export default function AddPch() {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/pch", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ nome }),
       });
 

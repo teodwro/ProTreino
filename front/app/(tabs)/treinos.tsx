@@ -7,9 +7,12 @@ import {
   StyleSheet,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Treino {
   id: number;
@@ -33,6 +36,7 @@ interface Treino {
 const TreinosScreen = () => {
   const [treinos, setTreinos] = useState<Treino[]>([]);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   useEffect(() => {
     buscarTreinos();
@@ -41,7 +45,12 @@ const TreinosScreen = () => {
   const buscarTreinos = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://127.0.0.1:8000/api/treinos');
+      const response = await fetch('http://127.0.0.1:8000/api/treinos', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
       const json = await response.json();
       setTreinos(json.data || []);
     } catch (error) {
@@ -94,7 +103,7 @@ const TreinosScreen = () => {
         </Text>
 
         {loading ? (
-          <Text style={styles.loadingText}>Carregando...</Text>
+          <ActivityIndicator size="large" color="#fff" style={styles.loadingText} />
         ) : (
           <FlatList
             data={treinos}

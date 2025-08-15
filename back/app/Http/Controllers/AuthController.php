@@ -73,4 +73,78 @@ class AuthController extends Controller
             "message" => "Credenciais inválidas!"
         ], 401); // 401 Unauthorized
     }
+
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Usuário não autenticado"
+            ], 401);
+        }
+
+        return response()->json([
+            "status" => "success",
+            "data" => ['user' => $user],
+            "message" => "Perfil obtido com sucesso!"
+        ], 200);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Usuário não autenticado"
+            ], 401);
+        }
+
+        $validate = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                "status" => "error",
+                "message" => $validate->errors()->getMessages()
+            ], 422);
+        }
+
+        $validated = $validate->validated();
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+
+        if ($user->save()) {
+            return response()->json([
+                "status" => "success",
+                "data" => ['user' => $user],
+                "message" => "Perfil atualizado com sucesso!"
+            ], 200);
+        }
+
+        return response()->json([
+            "status" => "error",
+            "message" => "Erro ao atualizar perfil"
+        ], 500);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        
+        if ($user) {
+            $user->tokens()->delete();
+        }
+
+        return response()->json([
+            "status" => "success",
+            "message" => "Logout realizado com sucesso!"
+        ], 200);
+    }
 }

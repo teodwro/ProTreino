@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Exercicio {
   id: number;
@@ -37,6 +38,7 @@ const AddTreino = () => {
   const [selectedExercicios, setSelectedExercicios] = useState<Exercicio[]>([]);
   const [treinoId, setTreinoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   const diasSemana = [
     { label: 'Selecione o dia', value: '' },
@@ -76,7 +78,12 @@ const AddTreino = () => {
 
   const fetchPCHs = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/pch');
+      const res = await fetch('http://127.0.0.1:8000/api/pch', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const json = await res.json();
       setPchList(json.data || []);
     } catch (error) {
@@ -89,7 +96,12 @@ const AddTreino = () => {
 
   const fetchExercicios = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/exercicios');
+      const res = await fetch('http://127.0.0.1:8000/api/exercicios', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const json = await res.json();
       const filtrados = json.data.filter((e: Exercicio) => String(e.pch?.id) === String(pchId));
       setExercicios(filtrados);
@@ -151,7 +163,10 @@ const AddTreino = () => {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload)
       });
 

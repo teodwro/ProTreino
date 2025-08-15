@@ -4,31 +4,47 @@ import { router, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Exercicios() {
   const [exercicios, setExercicios] = useState([]);
   const [pchList, setPchList] = useState([]);
   const [pchFilter, setPchFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   useFocusEffect(
     React.useCallback(() => {
-      fetch('http://127.0.0.1:8000/api/pch')
-        .then(response => response.json())
-        .then(json => setPchList(json.data || []))
-        .catch(() => setPchList([]));
-    }, [])
+      if (token) {
+        fetch('http://127.0.0.1:8000/api/pch', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(response => response.json())
+          .then(json => setPchList(json.data || []))
+          .catch(() => setPchList([]));
+      }
+    }, [token])
   );
 
   useFocusEffect(
     React.useCallback(() => {
-      setLoading(true);
-      fetch('http://127.0.0.1:8000/api/exercicios')
-        .then(response => response.json())
-        .then(json => setExercicios(json.data || []))
-        .catch(() => setExercicios([]))
-        .finally(() => setLoading(false));
-    }, [])
+      if (token) {
+        setLoading(true);
+        fetch('http://127.0.0.1:8000/api/exercicios', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(response => response.json())
+          .then(json => setExercicios(json.data || []))
+          .catch(() => setExercicios([]))
+          .finally(() => setLoading(false));
+      }
+    }, [token])
   );
 
   const exerciciosFiltrados = pchFilter

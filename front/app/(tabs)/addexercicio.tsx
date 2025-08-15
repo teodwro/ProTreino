@@ -13,20 +13,28 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function AdicionarExercicio() {
   const [nome, setNome] = useState("");
   const [pchId, setPchId] = useState("");
   const [pchList, setPchList] = useState([]);
   const router = useRouter();
+  const { token } = useAuth();
 
   useFocusEffect(
     React.useCallback(() => {
-      fetch("http://127.0.0.1:8000/api/pch")
+      if (!token) return;
+      fetch("http://127.0.0.1:8000/api/pch", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((res) => res.json())
         .then((json) => setPchList(json.data || []))
         .catch(() => setPchList([]));
-    }, [])
+    }, [token])
   );
 
   const handleAdicionar = async () => {
@@ -40,6 +48,7 @@ export default function AdicionarExercicio() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ nome, pch_id: pchId }),
       });

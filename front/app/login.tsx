@@ -1,84 +1,55 @@
 import React, { useState } from 'react';
-import { Text, TextInput, StyleSheet, TouchableOpacity, StatusBar, Alert, Image } from 'react-native';
-import { useRouter , Stack} from 'expo-router';
+import { Text, TextInput, StyleSheet, TouchableOpacity, StatusBar, Alert, Image, View, ActivityIndicator } from 'react-native';
+import { useRouter, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '../contexts/AuthContext';
 
 export const unstable_settings = {
-  headerShown: false, // para esconder a header na tela
+  headerShown: false,
 };
-
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      console.log('Preencha tudo')
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const text = await response.text();
-      console.log('Status:', response.status);
-      console.log('Texto da resposta:', text);
-
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        console.error('Erro ao interpretar JSON:', e);
-        Alert.alert('Erro', 'Resposta inválida do servidor');
-        return;
-      }
-
-      if (response.ok && data.status === 'success') {
-        console.log('Usuário:', data.data.user);
-        console.log('Token:', data.data.token);
-
-        Alert.alert('Sucesso', data.message || 'Login realizado com sucesso!');
-
-        // Salvar token no storage, se desejar:
-        // await AsyncStorage.setItem('token', data.data.token);
-
-        // Limpa campos
+      const success = await login(email, password);
+      if (success) {
+        Alert.alert('Sucesso', 'Login realizado com sucesso!');
         setEmail('');
         setPassword('');
-        router.push('/exercicio'); // Redireciona para a tela de exercícios
-
-      } else {
-        Alert.alert('Erro', data.message || 'Credenciais inválidas');
+        router.replace('/(tabs)/exercicio');
       }
     } catch (error) {
-      console.error('Erro de rede:', error);
-      Alert.alert('Erro', 'Não foi possível conectar ao servidor');
+      Alert.alert('Erro', error instanceof Error ? error.message : 'Erro ao fazer login');
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const router = useRouter();
 
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      {
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
-          <StatusBar barStyle="light-content" />
+      <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
+        <StatusBar barStyle="light-content" />
 
+        <View style={styles.logoContainer}>
           <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+        </View>
 
-        
-
-
-          <Text style={styles.title}>Login</Text>
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>Bem-vindo ao ProTreino</Text>
+          <Text style={styles.subtitle}>Faça login para acessar sua conta</Text>
 
           <TextInput
             style={styles.input}
@@ -88,6 +59,7 @@ export default function Login() {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            editable={!isLoading}
           />
 
           <TextInput
@@ -97,17 +69,26 @@ export default function Login() {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            editable={!isLoading}
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Entrar</Text>
+          <TouchableOpacity 
+            style={[styles.button, isLoading && styles.buttonDisabled]} 
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.buttonText}>Entrar</Text>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('/cadastro')}>
+          <TouchableOpacity onPress={() => router.push('/cadastro')} disabled={isLoading}>
             <Text style={styles.linkText}>Criar uma conta</Text>
           </TouchableOpacity>
-        </LinearGradient>
-      }
+        </View>
+      </LinearGradient>
     </>
   );
 }
@@ -117,19 +98,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 24,
+  },
+  logoContainer: {
     alignItems: 'center',
+    marginBottom: 40,
   },
   logo: {
-    width: 220,
-    height: 220,
+    width: 180,
+    height: 180,
     resizeMode: 'contain',
-    marginBottom: 20,
-    alignSelf: 'center', // <- Centraliza a logo
+  },
+  formContainer: {
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#94a3b8',
     marginBottom: 32,
     textAlign: 'center',
   },
@@ -137,20 +128,30 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#1e293b',
     color: '#fff',
-    padding: 14,
+    padding: 16,
     marginBottom: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     borderColor: '#334155',
     borderWidth: 1,
+    fontSize: 16,
   },
   button: {
     backgroundColor: '#3b82f6',
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 64,
-    borderRadius: 999,
+    borderRadius: 12,
     marginBottom: 16,
     width: '100%',
     alignItems: 'center',
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#64748b',
+    shadowOpacity: 0.1,
   },
   buttonText: {
     color: '#fff',
@@ -161,5 +162,6 @@ const styles = StyleSheet.create({
     color: '#3b82f6',
     fontSize: 16,
     marginTop: 16,
+    textDecorationLine: 'underline',
   },
 });

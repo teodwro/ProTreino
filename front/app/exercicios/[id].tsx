@@ -12,7 +12,7 @@ import {
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
-
+import { useAuth } from '../../contexts/AuthContext';
 
 
 type Exercicio = {
@@ -37,9 +37,17 @@ export default function ExercicioShow() {
   // Estados para os campos editáveis
   const [nome, setNome] = useState('');
 
+  const { token } = useAuth();
+
   useEffect(() => {
+    if (!token) return;
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/exercicios/${id}`)
+    fetch(`http://127.0.0.1:8000/api/exercicios/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((json) => {
         if (json.data) {
@@ -53,11 +61,16 @@ export default function ExercicioShow() {
       .catch(() => setExercicio(null))
       .finally(() => setLoading(false));
 
-      fetch('http://127.0.0.1:8000/api/pch') // ajuste o endpoint conforme seu backend
+    fetch('http://127.0.0.1:8000/api/pch', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((json) => setGrupos(json.data || []))
       .catch((err) => console.log('Erro ao carregar grupos:', err));
-  }, [id]);
+  }, [id, token]);
 
   async function handleSave() {
     if (!nome.trim()) {
@@ -71,6 +84,7 @@ export default function ExercicioShow() {
         method: 'PUT', // ou PATCH conforme seu backend
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           nome,
@@ -97,6 +111,9 @@ export default function ExercicioShow() {
   try {
     const res = await fetch(`http://127.0.0.1:8000/api/exercicios/${id}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (res.ok) {

@@ -34,6 +34,7 @@ export default function Cadastro() {
         setName('');
         setEmail('');
         setPassword('');
+        router.replace('/login');
         } else {
         Alert.alert('Erro', data.message || 'Erro ao cadastrar');
         }
@@ -41,10 +42,6 @@ export default function Cadastro() {
         console.error(error);
         Alert.alert('Erro', 'Erro de conexão com o servidor');
     }
-
-    setName('');
-    setEmail('');
-    setPassword('');
   };
 
   return (
@@ -88,7 +85,7 @@ export default function Cadastro() {
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/login')}>
+        <TouchableOpacity onPress={() => router.replace('/login')}>
           <Text style={styles.linkText}>Já tem uma conta? Faça login</Text>
         </TouchableOpacity>
       </LinearGradient>
