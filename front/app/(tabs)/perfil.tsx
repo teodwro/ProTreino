@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -10,12 +10,12 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../contexts/AuthContext';
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter, useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Perfil() {
   const router = useRouter();
@@ -29,9 +29,10 @@ export default function Perfil() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [editedName, setEditedName] = useState(user?.name || '');
-  const [editedEmail, setEditedEmail] = useState(user?.email || '');
-  const [foto, setFoto] = useState(require('../../assets/images/logo.png'));
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [editedName, setEditedName] = useState(user?.name || "");
+  const [editedEmail, setEditedEmail] = useState(user?.email || "");
+  const [foto, setFoto] = useState(require("../../assets/images/logo.png"));
 
   const handleSelecionarFoto = async () => {
     try {
@@ -44,28 +45,28 @@ export default function Perfil() {
 
       if (!result.canceled) {
         setFoto({ uri: result.assets[0].uri });
-        Alert.alert('Sucesso', 'Foto atualizada com sucesso!');
+        Alert.alert("Sucesso", "Foto atualizada com sucesso!");
       }
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível selecionar a foto');
+      Alert.alert("Erro", "Não foi possível selecionar a foto");
     }
   };
 
   const handleEditar = () => {
     setIsEditing(true);
-    setEditedName(user?.name || '');
-    setEditedEmail(user?.email || '');
+    setEditedName(user?.name || "");
+    setEditedEmail(user?.email || "");
   };
 
   const handleCancelar = () => {
     setIsEditing(false);
-    setEditedName(user?.name || '');
-    setEditedEmail(user?.email || '');
+    setEditedName(user?.name || "");
+    setEditedEmail(user?.email || "");
   };
 
   const handleSalvar = async () => {
     if (!editedName.trim() || !editedEmail.trim()) {
-      Alert.alert('Erro', 'Preencha todos os campos');
+      Alert.alert("Erro", "Preencha todos os campos");
       return;
     }
 
@@ -75,34 +76,35 @@ export default function Perfil() {
         name: editedName.trim(),
         email: editedEmail.trim(),
       });
-      
+
       if (success) {
         setIsEditing(false);
-        Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+        Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
       }
     } catch (error) {
-      Alert.alert('Erro', error instanceof Error ? error.message : 'Não foi possível atualizar o perfil');
+      Alert.alert(
+        "Erro",
+        error instanceof Error
+          ? error.message
+          : "Não foi possível atualizar o perfil"
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Sair',
-      'Tem certeza que deseja sair da sua conta?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Sair',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            router.replace('/login');
-          },
-        },
-      ]
-    );
+    if (isLoggingOut) return; // evita cliques múltiplos
+    setIsLoggingOut(true);
+
+    try {
+      await logout(); // chama o método do AuthProvider (POST no back + limpa AsyncStorage)
+      router.replace("/login"); // redireciona para tela de login
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível sair da conta");
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   if (!user) {
@@ -115,20 +117,29 @@ export default function Perfil() {
   }
 
   return (
-    <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
+    <LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       {/* Header com logo */}
       <View style={styles.header}>
-        <Image source={require('../../assets/images/logo.png')} style={styles.logoHeader} />
+        <Image
+          source={require("../../assets/images/logo.png")}
+          style={styles.logoHeader}
+        />
         <Text style={styles.headerTitle}>ProTreino</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.profileCard}>
           <View style={styles.photoSection}>
             <Image source={foto} style={styles.profilePhoto} />
-            <TouchableOpacity style={styles.photoButton} onPress={handleSelecionarFoto}>
+            <TouchableOpacity
+              style={styles.photoButton}
+              onPress={handleSelecionarFoto}
+            >
               <Ionicons name="camera" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -158,12 +169,18 @@ export default function Perfil() {
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Informações Pessoais</Text>
             {!isEditing ? (
-              <TouchableOpacity style={styles.editButton} onPress={handleEditar}>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={handleEditar}
+              >
                 <Ionicons name="pencil" size={16} color="#3b82f6" />
                 <Text style={styles.editButtonText}>Editar</Text>
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity style={styles.cancelButton} onPress={handleCancelar}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancelar}
+              >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
             )}
@@ -195,8 +212,11 @@ export default function Perfil() {
           </View>
 
           {isEditing && (
-            <TouchableOpacity 
-              style={[styles.saveButton, isLoading && styles.saveButtonDisabled]} 
+            <TouchableOpacity
+              style={[
+                styles.saveButton,
+                isLoading && styles.saveButtonDisabled,
+              ]}
               onPress={handleSalvar}
               disabled={isLoading}
             >
@@ -210,21 +230,33 @@ export default function Perfil() {
         </View>
 
         <View style={styles.actionsCard}>
-          <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/addtreino')}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push("/(tabs)/addtreino")}
+          >
             <Ionicons name="add-circle-outline" size={24} color="#3b82f6" />
             <Text style={styles.actionButtonText}>Criar Novo Treino</Text>
             <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/addexercicio')}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push("/(tabs)/addexercicio")}
+          >
             <Ionicons name="barbell-outline" size={24} color="#3b82f6" />
             <Text style={styles.actionButtonText}>Adicionar Exercício</Text>
             <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            disabled={isLoggingOut}
+          >
             <Ionicons name="log-out-outline" size={24} color="#ef4444" />
-            <Text style={styles.logoutButtonText}>Sair da Conta</Text>
+            <Text style={styles.logoutButtonText}>
+              {isLoggingOut ? "Saindo..." : "Sair da Conta"}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -233,246 +265,199 @@ export default function Perfil() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#0f172a',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0f172a",
   },
-  loadingText: {
-    color: '#fff',
-    marginTop: 16,
-    fontSize: 16,
-  },
+  loadingText: { color: "#fff", marginTop: 16, fontSize: 16 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 24,
   },
-  logoHeader: {
-    width: 40,
-    height: 40,
-    marginRight: 12,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  scroll: {
-    padding: 24,
-  },
+  logoHeader: { width: 40, height: 40, marginRight: 12 },
+  headerTitle: { fontSize: 24, fontWeight: "bold", color: "#fff" },
+  scroll: { padding: 24 },
   profileCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     borderRadius: 20,
     padding: 24,
     marginBottom: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 8,
   },
-  photoSection: {
-    position: 'relative',
-    marginBottom: 16,
-  },
+  photoSection: { position: "relative", marginBottom: 16 },
   profilePhoto: {
     width: 100,
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    borderColor: '#3b82f6',
+    borderColor: "#3b82f6",
   },
   photoButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: '#3b82f6',
+    backgroundColor: "#3b82f6",
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 3,
-    borderColor: '#1e293b',
+    borderColor: "#1e293b",
   },
   userName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   userEmail: {
     fontSize: 16,
-    color: '#94a3b8',
+    color: "#94a3b8",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    width: "100%",
     paddingHorizontal: 20,
   },
-  statItem: {
-    alignItems: 'center',
-  },
+  statItem: { alignItems: "center" },
   statNumber: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#3b82f6',
+    fontWeight: "bold",
+    color: "#3b82f6",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#94a3b8',
-    textTransform: 'uppercase',
+    color: "#94a3b8",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  statDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#334155',
-  },
+  statDivider: { width: 1, height: 40, backgroundColor: "#334155" },
   infoCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     borderRadius: 20,
     padding: 24,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 8,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
+  cardTitle: { fontSize: 18, fontWeight: "bold", color: "#fff" },
   editButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: "rgba(59, 130, 246, 0.1)",
   },
   editButtonText: {
-    color: '#3b82f6',
+    color: "#3b82f6",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     marginLeft: 4,
   },
   cancelButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
   },
-  cancelButtonText: {
-    color: '#ef4444',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    color: '#fff',
-    marginBottom: 8,
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  cancelButtonText: { color: "#ef4444", fontSize: 14, fontWeight: "500" },
+  inputGroup: { marginBottom: 20 },
+  label: { color: "#fff", marginBottom: 8, fontSize: 14, fontWeight: "600" },
   input: {
-    backgroundColor: '#0f172a',
-    color: '#fff',
+    backgroundColor: "#0f172a",
+    color: "#fff",
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: "#334155",
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     fontSize: 16,
   },
   inputDisabled: {
-    backgroundColor: '#1e293b',
-    color: '#94a3b8',
-    borderColor: '#475569',
+    backgroundColor: "#1e293b",
+    color: "#94a3b8",
+    borderColor: "#475569",
   },
   saveButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: "#3b82f6",
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#3b82f6',
+    alignItems: "center",
+    shadowColor: "#3b82f6",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
   },
-  saveButtonDisabled: {
-    backgroundColor: '#64748b',
-    shadowOpacity: 0.1,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  saveButtonDisabled: { backgroundColor: "#64748b", shadowOpacity: 0.1 },
+  saveButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   actionsCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 8,
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: '#0f172a',
+    backgroundColor: "#0f172a",
     marginBottom: 12,
   },
   actionButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginLeft: 12,
     flex: 1,
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderColor: "rgba(239, 68, 68, 0.3)",
   },
   logoutButtonText: {
-    color: '#ef4444',
+    color: "#ef4444",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginLeft: 12,
   },
 });

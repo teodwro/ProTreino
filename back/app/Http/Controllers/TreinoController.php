@@ -27,23 +27,42 @@ class TreinoController extends Controller
             'exercicios.*.carga' => 'nullable|string',
         ]);
 
-        $treino = Treino::create([
-            'dia_semana' => $request->dia_semana,
-            'pch_id' => $request->pch_id,
-        ]);
+        // Procura treino existente para o mesmo dia e pch
+        $treino = Treino::where('dia_semana', $request->dia_semana)->first();
 
-        foreach ($request->exercicios as $item) {
-            $treino->exercicios()->attach($item['exercicio_id'], [
-                'series' => $item['series'],
-                'repeticoes' => $item['repeticoes'],
-                'carga' => $item['carga'] ?? null,
+        if ($treino) {
+            // Atualiza os exercícios (remove todos e adiciona os novos)
+            $treino->exercicios()->detach();
+            foreach ($request->exercicios as $item) {
+                $treino->exercicios()->attach($item['exercicio_id'], [
+                    'series' => $item['series'],
+                    'repeticoes' => $item['repeticoes'],
+                    'carga' => $item['carga'] ?? null,
+                ]);
+            }
+            $treino->refresh();
+            return response()->json([
+                'message' => 'Treino atualizado com sucesso (dia já existia).',
+                'data' => $treino->load(['pch', 'exercicios']),
+            ]);
+        } else {
+            // Cria novo treino normalmente
+            $treino = Treino::create([
+                'dia_semana' => $request->dia_semana,
+                'pch_id' => $request->pch_id,
+            ]);
+            foreach ($request->exercicios as $item) {
+                $treino->exercicios()->attach($item['exercicio_id'], [
+                    'series' => $item['series'],
+                    'repeticoes' => $item['repeticoes'],
+                    'carga' => $item['carga'] ?? null,
+                ]);
+            }
+            return response()->json([
+                'message' => 'Treino criado com sucesso.',
+                'data' => $treino->load(['pch', 'exercicios']),
             ]);
         }
-
-        return response()->json([
-            'message' => 'Treino criado com sucesso.',
-            'data' => $treino->load(['pch', 'exercicios']),
-        ]);
     }
 
     public function update(Request $request, Treino $treino)
@@ -71,6 +90,14 @@ class TreinoController extends Controller
 
         return response()->json([
             'message' => 'Treino deletado com sucesso.'
+        ]);
+    }
+
+    public function show($id)
+    {
+        $treino = Treino::with(['pch', 'exercicios'])->findOrFail($id);
+        return response()->json([
+            'data' => $treino
         ]);
     }
 }
