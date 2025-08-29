@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('exercicios', ExercicioController::class);
     Route::resource('pch', PchController::class);
     Route::resource('treinos', TreinoController::class);
+    Route::get('/treinos/dia/{dia}', [TreinoController::class, 'byDay']);
 });
 
 // Rota para testar autenticação

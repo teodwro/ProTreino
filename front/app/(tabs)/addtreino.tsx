@@ -38,6 +38,7 @@ const AddTreino = () => {
   const [selectedExercicios, setSelectedExercicios] = useState<Exercicio[]>([]);
   const [treinoId, setTreinoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingDia, setLoadingDia] = useState(false);
   const { token } = useAuth();
 
   const diasSemana = [
@@ -75,6 +76,50 @@ const AddTreino = () => {
       fetchExercicios();
     }
   }, [pchId]);
+
+  // Quando muda o dia da semana, busca o treino existente e preenche
+  useEffect(() => {
+    const carregarTreinoDoDia = async () => {
+      if (!diaSemana) {
+        return;
+      }
+      try {
+        setLoadingDia(true);
+        const res = await fetch(`http://127.0.0.1:8000/api/treinos/dia/${diaSemana}`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        const json = await res.json();
+        const treino = json.data;
+        if (treino) {
+          setTreinoId(String(treino.id));
+          setPchId(String(treino.pch_id));
+          // Mapear exercicios existentes
+          const selecionados = (treino.exercicios || []).map((ex: any) => ({
+            id: ex.id,
+            nome: ex.nome,
+            series: ex.pivot?.series ?? "",
+            repeticoes: ex.pivot?.repeticoes ?? "",
+            carga: ex.pivot?.carga ?? "",
+          }));
+          setSelectedExercicios(selecionados);
+        } else {
+          // Nenhum treino no dia: limpa estado para criar do zero
+          setTreinoId(null);
+          setPchId("");
+          setSelectedExercicios([]);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingDia(false);
+      }
+    };
+
+    carregarTreinoDoDia();
+  }, [diaSemana]);
 
   const fetchPCHs = async () => {
     try {
@@ -144,6 +189,15 @@ const AddTreino = () => {
     );
   };
 
+  const resetForm = () => {
+    setDiaSemana("");
+    setPchId("");
+    setSelectedExercicios([]);
+    setExercicios([]);
+    setTreinoId(null);
+  };
+
+
   const salvarTreino = async () => {
     if (!diaSemana || !pchId || selectedExercicios.length === 0) {
       Alert.alert(
@@ -166,11 +220,9 @@ const AddTreino = () => {
 
     try {
       setLoading(true);
-      const url = treinoId
-        ? `http://127.0.0.1:8000/api/treinos/${treinoId}`
-        : "http://127.0.0.1:8000/api/treinos";
-
-      const method = treinoId ? "PUT" : "POST";
+      // Sempre usar POST para que o backend faça upsert por dia (atualiza se já existir)
+      const url = "http://127.0.0.1:8000/api/treinos";
+      const method = "POST";
 
       const res = await fetch(url, {
         method,
@@ -182,22 +234,13 @@ const AddTreino = () => {
       });
 
       if (res.ok) {
-        Alert.alert(
-          "Sucesso",
-          treinoId
-            ? "Treino atualizado com sucesso!"
-            : "Treino salvo com sucesso!"
-        );
-        if (!treinoId) {
-          // Resetar campos se for novo treino
-          setDiaSemana("");
-          setPchId("");
-          setSelectedExercicios([]);
-          setExercicios([]);
-          setTreinoId(null);
-        }
-        // Ir para a tela de treinos
-        router.replace("/treinos"); // ajuste o path se necessário
+        // Reset imediato (mesma lógica do botão reset) e navega para treinos
+        setDiaSemana("");
+        setPchId("");
+        setSelectedExercicios([]);
+        setExercicios([]);
+        setTreinoId(null);
+        router.replace("/treinos");
       } else {
         const json = await res.json();
         console.error(json);
@@ -251,7 +294,7 @@ const AddTreino = () => {
           selectedValue={pchId}
           onValueChange={setPchId}
           style={styles.picker}
-          enabled={!treinoId} // Desabilita se for edição
+          enabled={true}
         >
           <Picker.Item label="Selecione um grupo muscular" value="" />
           {pchList.map((pch) => (
@@ -340,6 +383,11 @@ const AddTreino = () => {
           )}
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.resetButton} onPress={resetForm}>
+        <Text style={styles.buttonText}>Resetar para novo treino</Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 };
@@ -438,6 +486,14 @@ const styles = StyleSheet.create({
     color: "#94a3b8",
     textAlign: "center",
     marginVertical: 10,
+  },
+  resetButton: {
+    alignSelf: "center",
+    backgroundColor: "#475569",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 12,
   },
 });
 

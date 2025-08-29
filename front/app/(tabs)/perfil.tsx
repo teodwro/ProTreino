@@ -34,23 +34,7 @@ export default function Perfil() {
   const [editedEmail, setEditedEmail] = useState(user?.email || "");
   const [foto, setFoto] = useState(require("../../assets/images/logo.png"));
 
-  const handleSelecionarFoto = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled) {
-        setFoto({ uri: result.assets[0].uri });
-        Alert.alert("Sucesso", "Foto atualizada com sucesso!");
-      }
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível selecionar a foto");
-    }
-  };
+ 
 
   const handleEditar = () => {
     setIsEditing(true);
@@ -134,15 +118,7 @@ export default function Perfil() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.profileCard}>
-          <View style={styles.photoSection}>
-            <Image source={foto} style={styles.profilePhoto} />
-            <TouchableOpacity
-              style={styles.photoButton}
-              onPress={handleSelecionarFoto}
-            >
-              <Ionicons name="camera" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
+          
 
           <Text style={styles.userName}>{user.name}</Text>
           <Text style={styles.userEmail}>{user.email}</Text>

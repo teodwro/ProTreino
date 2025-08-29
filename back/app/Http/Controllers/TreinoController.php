@@ -100,4 +100,21 @@ class TreinoController extends Controller
             'data' => $treino
         ]);
     }
+
+    public function byDay($dia)
+    {
+        $diaInt = (int) $dia;
+        if ($diaInt < 1 || $diaInt > 7) {
+            return response()->json([
+                'message' => 'Dia da semana inválido. Use 1-7.'
+            ], 422);
+        }
+
+        $treino = Treino::with(['pch', 'exercicios'])->where('dia_semana', $diaInt)->first();
+
+        return response()->json([
+            'message' => $treino ? 'Treino encontrado.' : 'Nenhum treino para o dia informado.',
+            'data' => $treino
+        ]);
+    }
 }

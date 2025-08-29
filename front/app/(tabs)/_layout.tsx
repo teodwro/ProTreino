@@ -17,14 +17,19 @@ export default function TabLayout() {
           tabBarInactiveTintColor: isDark ? '#94a3b8' : '#64748b',
           headerShown: false,
           tabBarStyle: {
-            height: 70,
+            position: 'absolute',
+            left: 16,
+            right: 16,
+            bottom: 16,
+            height: 64,
             borderTopWidth: 0,
-            backgroundColor: isDark ? '#1e293b' : '#f8fafc',
+            backgroundColor: isDark ? '#0b1220' : '#ffffff',
+            borderRadius: 16,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 10,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 12,
             paddingBottom: 0,
           },
           tabBarItemStyle: {
@@ -32,9 +37,9 @@ export default function TabLayout() {
           },
           tabBarLabelStyle: {
             fontSize: 12,
-            fontWeight: '500',
-            marginTop: -4,
-            marginBottom: 4
+            fontWeight: '600',
+            marginTop: -2,
+            marginBottom: 6,
           },
         }}>
         <Tabs.Screen
@@ -70,31 +75,15 @@ export default function TabLayout() {
         <Tabs.Screen
           name="addexercicio"
           options={{
+            href: null,
             title: 'Novo Exercício',
-            tabBarIcon: ({ color, focused }) => (
-              <View style={focused ? styles.iconActive : styles.iconInactive}>
-                <Ionicons 
-                  name={focused ? "add-circle" : "add-circle-outline"} 
-                  size={24} 
-                  color={color} 
-                />
-              </View>
-            ),
           }}
         />
         <Tabs.Screen
           name="addpch"
           options={{
+            href: null,
             title: 'Novo Grupo',
-            tabBarIcon: ({ color, focused }) => (
-              <View style={focused ? styles.iconActive : styles.iconInactive}>
-                <Ionicons 
-                  name={focused ? "add-outline" : "add"} 
-                  size={24} 
-                  color={color} 
-                />
-              </View>
-            ),
           }}
         />
         <Tabs.Screen
@@ -119,14 +108,14 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   iconActive: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
     padding: 8,
-    borderRadius: 16,
-    marginTop: 4, 
+    borderRadius: 12,
+    marginTop: 4,
   },
   iconInactive: {
     padding: 8,
-    borderRadius: 16,
-    marginTop: 4, 
+    borderRadius: 12,
+    marginTop: 4,
   },
 });

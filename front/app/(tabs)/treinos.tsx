@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -42,6 +42,13 @@ const TreinosScreen = () => {
     buscarTreinos();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      buscarTreinos();
+      return () => {};
+    }, [])
+  );
+
   const buscarTreinos = async () => {
     try {
       setLoading(true);
@@ -62,23 +69,7 @@ const TreinosScreen = () => {
   };
 
   const onSelectTreino = (treino: Treino) => {
-    router.push({
-      pathname: "/addTreino",
-      params: {
-        treinoId: treino.id.toString(),
-        diaSemana: treino.dia_semana.toString(),
-        pchId: treino.pch_id.toString(),
-        exercicios: JSON.stringify(
-          treino.exercicios.map((ex) => ({
-            id: ex.id,
-            nome: ex.nome,
-            series: ex.pivot.series,
-            repeticoes: ex.pivot.repeticoes,
-            carga: ex.pivot.carga,
-          }))
-        ),
-      },
-    });
+    router.push({ pathname: "/treinos/" + treino.id });
   };
 
   const getDiaSemana = (dia: number): string => {
