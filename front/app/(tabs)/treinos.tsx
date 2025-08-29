@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   StatusBar,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import { Stack, router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '../../contexts/AuthContext';
+} from "react-native";
+import { Stack, router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Treino {
   id: number;
@@ -45,16 +45,16 @@ const TreinosScreen = () => {
   const buscarTreinos = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://127.0.0.1:8000/api/treinos', {
+      const response = await fetch("http://127.0.0.1:8000/api/treinos", {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
       const json = await response.json();
       setTreinos(json.data || []);
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível carregar os treinos.');
+      Alert.alert("Erro", "Não foi possível carregar os treinos.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -63,39 +63,41 @@ const TreinosScreen = () => {
 
   const onSelectTreino = (treino: Treino) => {
     router.push({
-      pathname: '/addTreino',
+      pathname: "/addTreino",
       params: {
         treinoId: treino.id.toString(),
         diaSemana: treino.dia_semana.toString(),
         pchId: treino.pch_id.toString(),
-        exercicios: JSON.stringify(treino.exercicios.map(ex => ({
-          id: ex.id,
-          nome: ex.nome,
-          series: ex.pivot.series,
-          repeticoes: ex.pivot.repeticoes,
-          carga: ex.pivot.carga
-        })))
-      }
+        exercicios: JSON.stringify(
+          treino.exercicios.map((ex) => ({
+            id: ex.id,
+            nome: ex.nome,
+            series: ex.pivot.series,
+            repeticoes: ex.pivot.repeticoes,
+            carga: ex.pivot.carga,
+          }))
+        ),
+      },
     });
   };
 
   const getDiaSemana = (dia: number): string => {
     const dias = [
-      'Segunda-feira',
-      'Terça-feira',
-      'Quarta-feira',
-      'Quinta-feira',
-      'Sexta-feira',
-      'Sábado',
-      'Domingo'
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado",
+      "Domingo",
     ];
-    return dias[dia - 1] || '';
+    return dias[dia - 1] || "";
   };
 
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
+      <LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
         <StatusBar barStyle="light-content" />
         <Text style={styles.title}>Seus Treinos</Text>
         <Text style={styles.subtitle}>
@@ -103,7 +105,11 @@ const TreinosScreen = () => {
         </Text>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#fff" style={styles.loadingText} />
+          <ActivityIndicator
+            size="large"
+            color="#fff"
+            style={styles.loadingText}
+          />
         ) : (
           <FlatList
             data={treinos}
@@ -118,10 +124,11 @@ const TreinosScreen = () => {
                   {getDiaSemana(item.dia_semana)}
                 </Text>
                 <Text style={styles.cardSubtext}>
-                  {item.pch?.nome || 'Sem grupo muscular'}
+                  {item.pch?.nome || "Sem grupo muscular"}
                 </Text>
                 <Text style={styles.cardSubtext}>
-                  {item.exercicios.length} exercício{item.exercicios.length !== 1 ? 's' : ''}
+                  {item.exercicios.length} exercício
+                  {item.exercicios.length !== 1 ? "s" : ""}
                 </Text>
               </TouchableOpacity>
             )}
@@ -143,15 +150,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '600',
-    color: '#fff',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "#fff",
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#cbd5e1',
-    textAlign: 'center',
+    color: "#cbd5e1",
+    textAlign: "center",
     marginBottom: 24,
     paddingHorizontal: 10,
     lineHeight: 22,
@@ -160,32 +167,32 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    backgroundColor: '#1e40af',
+    backgroundColor: "#1e40af",
     padding: 20,
     borderRadius: 12,
     marginBottom: 12,
     elevation: 4,
   },
   cardText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   cardSubtext: {
-    color: '#dbeafe',
+    color: "#dbeafe",
     fontSize: 14,
     marginBottom: 2,
   },
   emptyText: {
-    color: '#94a3b8',
+    color: "#94a3b8",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
   },
   loadingText: {
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
     marginTop: 40,
   },
 });

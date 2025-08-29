@@ -66,11 +66,20 @@ export default function AdicionarExercicio() {
       if (response.ok && data.status === "success") {
         Alert.alert(
           "Sucesso",
-          data.message || "Exercício cadastrado com sucesso!"
+          data.message || "Exercício cadastrado com sucesso!",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                // Força reset da tela navegando para ela mesma, depois para treinos
+                router.replace("/addexercicio");
+                setTimeout(() => {
+                  router.replace("/treinos");
+                }, 100);
+              },
+            },
+          ]
         );
-        setNome("");
-        setPchId("");
-        router.push("/exercicio");
       } else {
         Alert.alert("Erro", data.message || "Erro ao cadastrar exercício");
       }
